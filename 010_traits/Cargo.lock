@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "generic_types"
+name = "traits"
 version = "0.1.0"
