@@ -1,6 +1,8 @@
+// Define Structs
 struct Dog {name: String}
 struct Cat {name: String}
 
+// Define traits
 trait Pet {
     fn speak(&self);
     fn sleep(&self) {

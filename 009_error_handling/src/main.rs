@@ -1,27 +1,36 @@
-use rand::Rng; // import 3rd party crate
+use rand::{thread_rng, Rng}; // import 3rd party crate
 
-// Implement our own result enum
+// Custom Enums Definitions
 enum Result<T, E> {
     OK(T),
     Err(E),
 }
+use Result::{OK, Err}
 
-// Returns a number if it is greater than 100, else an error
-fn gen_above_100() -> Result<u8, &'static str> {
-    let mut rng = rand::thread_rng();
-    let score: u8 = rng.gen();
+enum Error<'a> {
+    TooLow{msg: &'a str, val: u32},
+    TooHigh{msg: &'a str, val: u32},
+}
+use Error::{TooHigh, TooLow};
 
-    if score > 100 {
-        return Result::OK(score);
-    } else {
-        return Result::Err("score not high enough");
-    }
+// Function returns a Result enum
+fn goldilocks() -> Result<u32, Error<'static>> {
+    let mut rng = thread_rng();    
+    let value: u32 = rng.gen_range(0..300);
+    if value < 100 {return Err(TooLow{msg: "Value is too low", val: value})}
+    if value > 200 {return Err(TooHigh{msg: "Value is too High", val: value})}    
+    return OK(value);    
 }
 
 fn main() {
-    let r = gen_above_100();
+    let r = goldilocks();
     match r {
-        Result::OK(val) => println!("SUCCESS: {}", val),
-        Result::Err(err_msg) => println!("ERROR: {}", err_msg)
+        OK(val) => println!("Just Right - {}", val),
+        Err(err) => { 
+            match err {
+                TooLow{msg, val} => println!("{} - {}", msg, val),
+                TooHigh{msg, val} => println!("{} - {}", msg, val),
+            }
+        }
     }    
 }
