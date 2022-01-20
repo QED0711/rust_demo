@@ -17,4 +17,5 @@ fn main() {
     println!("{}", p1.x());
     println!("{}", p2.y());
 
+
 }
