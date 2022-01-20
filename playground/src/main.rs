@@ -1,43 +1,37 @@
+use std::f64::consts::PI;
 
+struct Rectangle {height: f64, width: f64}
+struct Circle {radius: f64}
 
-struct Car {
-    mpg: f32, 
-    tank_size: f32
+trait HasArea {
+    fn area(&self) -> f64;
 }
 
-struct Motercycle {
-    mpg: f32, 
-    tank_size: f32
+impl HasArea for Rectangle {
+    fn area(&self) -> f64 {
+        &self.height * &self.width
+    }
 }
-
-trait Performance {
-    fn calc_max_distance(&self) -> f32;
-}
-
-impl Performance for Car {
-    fn calc_max_distance(&self) -> f32 {
-        self.mpg * self.tank_size  
+impl HasArea for Circle {
+    fn area(&self) -> f64 {
+        PI * &self.radius.powf(2.0)
     }
 }
 
-impl Performance for Motercycle {
-    fn calc_max_distance(&self) -> f32 {
-        self.mpg * self.tank_size  
+struct Shape<T: HasArea> (T);
+impl<T: HasArea> Shape<T> {
+    fn area_times_n(&self, n: f64) -> f64 {
+        self.0.area() * n
     }
 }
 
-struct Vehicle<T: Performance> {kind: T}
-impl Vehicle<Car> {
-    fn distance<T: Performance>(&self) -> f32 {
-        &self.kind.calc_max_distance()
-    }
-}
 
 fn main() {
-    let civic = Vehicle{kind: Car{mpg: 30.5, tank_size: 11.2}};
-    let harley = Vehicle{kind: Motercycle{mpg: 50.7, tank_size: 6.5}};
 
-    civic.distance();
+    let rect = Shape(Rectangle{height: 5.5, width: 10.2});
+    let circ = Shape(Circle{radius: 3.6});
 
+    println!("{}", rect.area_times_n(5.0));
+    println!("{}", circ.area_times_n(5.0));
 
 }
