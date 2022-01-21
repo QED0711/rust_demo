@@ -1,37 +1,40 @@
-// Define Structs
-struct Dog {name: String}
-struct Cat {name: String}
+use std::f64::consts::PI;
 
-// Define traits
-trait Pet {
-    fn speak(&self);
-    fn sleep(&self) {
-        println!("zzzzz...");
+// Base Struct Setup
+struct Rectangle {height: f64, width: f64}
+struct Circle {radius: f64}
+
+// Trait defines functionality to be shared amongst various other types
+trait Area {
+    fn get_area(&self) -> f64;
+}
+
+// train implementations
+impl Area for Rectangle {
+    fn get_area(&self) -> f64 {
+        &self.height * &self.width
+    }
+}
+impl Area for Circle {
+    fn get_area(&self) -> f64 {
+        PI * &self.radius.powf(2.0)
     }
 }
 
-impl Pet for Dog {
-    fn speak(&self){
-        println!("Woof, my name is {}", self.name);
+struct Shape<T: Area> (T);
+impl<T: Area> Shape<T> {
+    fn area_times_n(&self, n: f64) -> f64 {
+        self.0.get_area() * n
     }
 }
 
-impl Pet for Cat {
-    fn speak (&self){
-        println!("Meow, my name is {}", self.name);
-    }
-    fn sleep(&self){
-        println!("purrr...");
-    }
-}
 
 fn main() {
 
-    let dog = Dog{name: "Rover".to_string()};
-    dog.speak();
-    dog.sleep();
-    
-    let cat = Cat{name: "Mittens".to_string()};
-    cat.speak();
-    cat.sleep();
+    let rect = Shape(Rectangle{height: 5.5, width: 10.2});
+    let circ = Shape(Circle{radius: 3.6});
+
+    println!("{}", rect.area_times_n(5.0));
+    println!("{}", circ.area_times_n(5.0));
+
 }
