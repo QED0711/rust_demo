@@ -1,37 +1,46 @@
-use std::f64::consts::PI;
+use std::{time::{Instant}};
+use rand::{thread_rng, Rng};
+use rayon::prelude::*;
 
-struct Rectangle {height: f64, width: f64}
-struct Circle {radius: f64}
-
-trait HasArea {
-    fn area(&self) -> f64;
+struct Point {
+    x: f64,
+    y: f64,
 }
-
-impl HasArea for Rectangle {
-    fn area(&self) -> f64 {
-        &self.height * &self.width
+impl Point {
+    fn is_self(&self, p: &Point) -> bool {
+        p.x == self.x && p.y == self.y
+    }
+    fn distance_to(&self, p: &Point) -> f64 {
+        if self.is_self(p) {
+            return 0.0;
+        }
+        let x_delta_sqr = (&self.x - p.x).powf(2.0);
+        let y_delta_sqr = (&self.y - p.y).powf(2.0);
+        (x_delta_sqr + y_delta_sqr).sqrt()
     }
 }
-impl HasArea for Circle {
-    fn area(&self) -> f64 {
-        PI * &self.radius.powf(2.0)
-    }
-}
-
-struct Shape<T: HasArea> (T);
-impl<T: HasArea> Shape<T> {
-    fn area_times_n(&self, n: f64) -> f64 {
-        self.0.area() * n
-    }
-}
-
 
 fn main() {
+    let mut rng = thread_rng();
+    let mut points: Vec<Point> = Vec::new();
+    for _i in 0..100_000 {
+        points.push(Point{x: rng.gen(), y: rng.gen()});
+    }
 
-    let rect = Shape(Rectangle{height: 5.5, width: 10.2});
-    let circ = Shape(Circle{radius: 3.6});
+    let now = Instant::now();
 
-    println!("{}", rect.area_times_n(5.0));
-    println!("{}", circ.area_times_n(5.0));
+    let distances: Vec<Vec<f64>> = points
+        .par_iter()
+        .map(|p1| -> Vec<f64> {
+            points
+                .par_iter()
+                .map(|p2| -> f64 { p1.distance_to(p2) })
+                .filter(|dist| *dist > 0.0)
+                .collect()
+        })
+        .collect();
+    
+    let elapsed = now.elapsed();
+    println!("Time to calculate {} : {:?}ms", distances.len(), (elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() as u64 / 1_000_000));
 
 }
