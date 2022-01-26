@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "structs_and_generics"
+name = "smart_pointers"
 version = "0.1.0"
